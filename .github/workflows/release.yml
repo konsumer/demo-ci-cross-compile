@@ -38,7 +38,7 @@ jobs:
           fetch-depth: 0
       - name: setup-linux
         if: matrix.os == 'ubuntu-latest'
-        run: apt-get update && apt-get install -y xorg-dev libglu1-mesa-dev cmake
+        run: sudo apt-get update && sudo apt-get install -y xorg-dev libglu1-mesa-dev cmake
       - name: builld-x86_64 ${{ matrix.os }} artifact
         run: cmake . && make
       - name: upload ${{ matrix.os }} artifact
