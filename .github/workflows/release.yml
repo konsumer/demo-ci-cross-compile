@@ -25,7 +25,8 @@ jobs:
           body: This is an automated release for ${{ github.ref }}.
         env:
           GITHUB_TOKEN: ${{ github.token }}
-  build_linux:
+  
+  linux:
     needs: create_release
     runs-on: ubuntu-latest
     steps:
@@ -52,7 +53,7 @@ jobs:
           upload_url: ${{ needs.create_release.outputs.upload_url }}
           asset_path:  my_raylib_game.zip
           asset_name:  my_raylib_game-linux-x86_64.zip
-          asset_content_type: application/octet-stream
+          asset_content_type: application/zip
       - name: zip artifact (arm64)
         run: cd build-arm64 && zip ../my_raylib_game-arm64.zip my_raylib_game
       - name: upload artifact (x86-64)
@@ -63,9 +64,9 @@ jobs:
           upload_url: ${{ needs.create_release.outputs.upload_url }}
           asset_path:  my_raylib_game-arm64.zip
           asset_name:  my_raylib_game-linux-arm64.zip
-          asset_content_type: application/octet-stream
+          asset_content_type: application/zip
 
-  build_mac:
+  mac:
     needs: create_release
     runs-on: macos-latest
     steps:
@@ -85,9 +86,9 @@ jobs:
           upload_url: ${{ needs.create_release.outputs.upload_url }}
           asset_path:  my_raylib_game.zip
           asset_name:  my_raylib_game-linux-x86_64.zip
-          asset_content_type: application/octet-stream
+          asset_content_type: application/zip
 
-  build_windows:
+  windows:
     needs: create_release
     runs-on: windows-latest
     steps:
@@ -107,5 +108,5 @@ jobs:
           upload_url: ${{ needs.create_release.outputs.upload_url }}
           asset_path:  my_raylib_game.zip
           asset_name:  my_raylib_game-windows-x86_64.zip
-          asset_content_type: application/octet-stream
+          asset_content_type: application/zip
 
