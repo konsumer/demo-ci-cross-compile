@@ -10,7 +10,7 @@ on:
 
 jobs:
   create_release:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu
     outputs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
     steps:
@@ -29,7 +29,7 @@ jobs:
     needs: create_release
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu, macos]
     runs-on: ${{ matrix.os }}
     steps:
       - name: checkout
@@ -37,24 +37,27 @@ jobs:
         with:
           fetch-depth: 0
       - name: setup-linux
-        if: matrix.os == 'ubuntu-latest'
+        if: matrix.os == 'ubuntu'
         run: sudo apt-get update && sudo apt-get install -y xorg-dev libglu1-mesa-dev cmake
       - name: builld-x86_64 ${{ matrix.os }} artifact
         run: cmake . && make
+      - uses: montudor/action-zip@v1
+        with:
+          args: zip -qq -r my_raylib_game.zip my_raylib_game
       - name: upload ${{ matrix.os }} artifact
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
           upload_url: ${{ needs.create_release.outputs.upload_url }}
-          asset_path:  my_raylib_game
-          asset_name:  my_raylib_game-${{ matrix.os }}
+          asset_path:  my_raylib_game.zip
+          asset_name:  my_raylib_game-${{ matrix.os }}-x86_64.zip
           asset_content_type: application/octet-stream
   build_windows:
     needs: create_release
     strategy:
       matrix:
-        os: [windows-latest]
+        os: [windows]
     runs-on: ${{ matrix.os }}
     steps:
       - name: checkout
@@ -63,13 +66,16 @@ jobs:
           fetch-depth: 0
       - name: builld-x86_64 ${{ matrix.os }} artifact
         run: cmake . -G "MinGW Makefiles" && make
+      - uses: montudor/action-zip@v1
+        with:
+          args: zip -qq -r my_raylib_game.zip my_raylib_game.exe
       - name: upload ${{ matrix.os }} artifact
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
           upload_url: ${{ needs.create_release.outputs.upload_url }}
-          asset_path:  my_raylib_game.exe
-          asset_name:  my_raylib_game-${{ matrix.os }}.exe
+          asset_path:  my_raylib_game.zip
+          asset_name:  my_raylib_game-${{ matrix.os }}-x86_64.zip
           asset_content_type: application/octet-stream
 
