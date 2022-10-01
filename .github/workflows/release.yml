@@ -5,6 +5,9 @@ name: Release
 #     tags:
 #       - 'v*'
 
+on:
+  push
+
 jobs:
   create_release:
     runs-on: ubuntu-latest
