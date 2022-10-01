@@ -21,15 +21,15 @@ jobs:
           draft: false
           prerelease: false
           release_name: Automated Release ${{ github.ref }} - ${{ github.sha }}
-          tag_name: v${{ github.sha }}
+          tag_name: release-${{ github.sha }}
           body: This is an automated release for ${{ github.ref }}.
         env:
           GITHUB_TOKEN: ${{ github.token }}
-  build_for_release:
+  build_posix:
     needs: create_release
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
       - name: checkout
@@ -39,12 +39,8 @@ jobs:
       - name: setup-linux
         if: matrix.os == 'ubuntu-latest'
         run: sudo apt-get update && sudo apt-get install -y xorg-dev libglu1-mesa-dev cmake
-      - name: builld-x86_64 ${{ matrix.os }} artifact (non-windows)
+      - name: builld-x86_64 ${{ matrix.os }} artifact
         run: cmake . && make
-        if: matrix.os != 'windows-latest'
-      - name: builld-x86_64 ${{ matrix.os }} artifact (windows)
-        run: cmake . -G "MinGW Makefiles" && make
-        if: matrix.os == 'windows-latest'
       - name: upload ${{ matrix.os }} artifact
         uses: actions/upload-release-asset@v1
         env:
@@ -53,5 +49,27 @@ jobs:
           upload_url: ${{ needs.create_release.outputs.upload_url }}
           asset_path:  my_raylib_game
           asset_name:  my_raylib_game-${{ matrix.os }}
+          asset_content_type: application/octet-stream
+  build_windows:
+    needs: create_release
+    strategy:
+      matrix:
+        os: [windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: builld-x86_64 ${{ matrix.os }} artifact
+        run: cmake . && make
+      - name: upload ${{ matrix.os }} artifact
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ needs.create_release.outputs.upload_url }}
+          asset_path:  my_raylib_game.exe
+          asset_name:  my_raylib_game-${{ matrix.os }}.exe
           asset_content_type: application/octet-stream
 
