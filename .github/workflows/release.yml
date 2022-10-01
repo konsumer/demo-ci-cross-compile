@@ -62,7 +62,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: builld-x86_64 ${{ matrix.os }} artifact
-        run: cmake . && make
+        run: cmake . -G "MinGW Makefiles" && make
       - name: upload ${{ matrix.os }} artifact
         uses: actions/upload-release-asset@v1
         env:
