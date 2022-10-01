@@ -39,8 +39,12 @@ jobs:
       - name: setup-linux
         if: matrix.os == 'ubuntu-latest'
         run: sudo apt-get update && sudo apt-get install -y xorg-dev libglu1-mesa-dev cmake
-      - name: builld-x86_64 ${{ matrix.os }} artifact
+      - name: builld-x86_64 ${{ matrix.os }} artifact (non-windows)
         run: cmake . && make
+        if: matrix.os != 'windows-latest'
+      - name: builld-x86_64 ${{ matrix.os }} artifact (windows)
+        run: cmake . -G mingw32-make && make
+        if: matrix.os == 'windows-latest'
       - name: upload ${{ matrix.os }} artifact
         uses: actions/upload-release-asset@v1
         env:

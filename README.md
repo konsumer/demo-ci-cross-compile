@@ -3,10 +3,8 @@ This is a very simple raylib app built with cmake that automatically releases fo
 ## local usage
 
 ```
-rm -rf build
-mkdir build
+cmake -S . build
 cd build
-cmake ..
 make
 ./my_raylib_game
 ```
