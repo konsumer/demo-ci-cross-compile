@@ -25,74 +25,87 @@ jobs:
           body: This is an automated release for ${{ github.ref }}.
         env:
           GITHUB_TOKEN: ${{ github.token }}
-  build_posix:
+  build_linux:
     needs: create_release
-    strategy:
-      matrix:
-        os: [ubuntu, macos]
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     steps:
       - name: checkout
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - name: setup-linux
-        if: matrix.os == 'ubuntu'
-        run: sudo apt-get update && sudo apt-get install -y xorg-dev libglu1-mesa-dev cmake
-      - name: builld-x86_64 ${{ matrix.os }} artifact
+      - name: setup
+        run: sudo apt-get update && sudo apt-get install -y xorg-dev libglu1-mesa-dev cmake binutils-aarch64-linux-gnu gcc-aarch64-linux-gnu
+      - name: builld-x86_64 artifact
         run: cmake . && make
-      - name: builld-arm64 ${{ matrix.os }} artifact
-        if: matrix.os == 'ubuntu'
-        run: sudo apt-get install -qy binutils-aarch64-linux-gnu gcc-aarch64-linux-gnu && cmake -S . build-arm64 && cd build-arm64 && make
+      - name: builld-arm64 artifact
+        run: cmake -S . build-arm64 && cd build-arm64 && make
         env:
           CMAKE_SYSTEM_PROCESSOR: aarch64
           CMAKE_C_COMPILER: aarch64-linux-gnu-gcc
-      - name: zip ${{ matrix.os }-x86_64} artifact
+      - name: zip artifact (x86-64)
         run: zip my_raylib_game.zip my_raylib_game
-      - name: zip ${{ matrix.os }-arm64}} artifact
-        if: matrix.os == 'ubuntu'
-        run: cd build-arm64 && zip ../my_raylib_game-arm64.zip my_raylib_game
-      - name: upload ${{ matrix.os }} artifact
+      - name: upload artifact (x86-64)
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
           upload_url: ${{ needs.create_release.outputs.upload_url }}
           asset_path:  my_raylib_game.zip
-          asset_name:  my_raylib_game-${{ matrix.os }}-x86_64.zip
+          asset_name:  my_raylib_game-linux-x86_64.zip
           asset_content_type: application/octet-stream
-      - name: upload ${{ matrix.os }} arm64 artifact
-        if: matrix.os == 'ubuntu'
+      - name: zip artifact (arm64)
+        run: cd build-arm64 && zip ../my_raylib_game-arm64.zip my_raylib_game
+      - name: upload artifact (x86-64)
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
           upload_url: ${{ needs.create_release.outputs.upload_url }}
           asset_path:  my_raylib_game-arm64.zip
-          asset_name:  my_raylib_game-${{ matrix.os }}-arm64.zip
+          asset_name:  my_raylib_game-linux-arm64.zip
           asset_content_type: application/octet-stream
-  build_windows:
+
+  build_mac:
     needs: create_release
-    strategy:
-      matrix:
-        os: [windows]
-    runs-on: ${{ matrix.os }}
+    runs-on: macos-latest
     steps:
       - name: checkout
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - name: builld-x86_64 ${{ matrix.os }} artifact
-        run: cmake . -G "MinGW Makefiles" && make
-      - name: zip ${{ matrix.os }} artifact
-        run: zip my_raylib_game.zip my_raylib_game.exe
-      - name: upload ${{ matrix.os }} artifact
+      - name: builld-x86_64 artifact
+        run: cmake . && make
+      - name: zip artifact
+        run: zip my_raylib_game.zip my_raylib_game
+      - name: upload artifact
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
           upload_url: ${{ needs.create_release.outputs.upload_url }}
           asset_path:  my_raylib_game.zip
-          asset_name:  my_raylib_game-${{ matrix.os }}-x86_64.zip
+          asset_name:  my_raylib_game-linux-x86_64.zip
+          asset_content_type: application/octet-stream
+
+  build_windows:
+    needs: create_release
+    runs-on: windows-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: builld-x86_64 artifact
+        run: cmake . -G "MinGW Makefiles" && make
+      - name: zip artifact
+        run: zip my_raylib_game.zip my_raylib_game.exe
+      - name: upload artifact
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ needs.create_release.outputs.upload_url }}
+          asset_path:  my_raylib_game.zip
+          asset_name:  my_raylib_game-windows-x86_64.zip
           asset_content_type: application/octet-stream
 
