@@ -41,9 +41,8 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y xorg-dev libglu1-mesa-dev cmake
       - name: builld-x86_64 ${{ matrix.os }} artifact
         run: cmake . && make
-      - uses: montudor/action-zip@v1
-        with:
-          args: zip -qq -r my_raylib_game.zip my_raylib_game
+      - name: zip ${{ matrix.os }} artifact
+        run: zip my_raylib_game.zip my_raylib_game
       - name: upload ${{ matrix.os }} artifact
         uses: actions/upload-release-asset@v1
         env:
@@ -66,9 +65,8 @@ jobs:
           fetch-depth: 0
       - name: builld-x86_64 ${{ matrix.os }} artifact
         run: cmake . -G "MinGW Makefiles" && make
-      - uses: montudor/action-zip@v1
-        with:
-          args: zip -qq -r my_raylib_game.zip my_raylib_game.exe
+      - name: zip ${{ matrix.os }} artifact
+        run: zip my_raylib_game.zip my_raylib_game.exe
       - name: upload ${{ matrix.os }} artifact
         uses: actions/upload-release-asset@v1
         env:
