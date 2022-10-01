@@ -43,7 +43,7 @@ jobs:
         run: cmake . && make
         if: matrix.os != 'windows-latest'
       - name: builld-x86_64 ${{ matrix.os }} artifact (windows)
-        run: cmake . -G mingw32-make && make
+        run: cmake . -G "MinGW Makefiles" && make
         if: matrix.os == 'windows-latest'
       - name: upload ${{ matrix.os }} artifact
         uses: actions/upload-release-asset@v1
