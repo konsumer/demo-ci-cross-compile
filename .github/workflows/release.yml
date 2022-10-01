@@ -22,11 +22,11 @@ jobs:
           body: This is an automated release for ${{ github.ref }}.
         env:
           GITHUB_TOKEN: ${{ github.token }}
-  build:
+  build_for_release:
     needs: create_release
     strategy:
       matrix:
-        os: ["ubuntu-latest", "windows-latest", "macos-latest"]
+        os: [ubuntu-latest, windows-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
       - name: checkout
