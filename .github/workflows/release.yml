@@ -49,7 +49,8 @@ jobs:
           CMAKE_C_COMPILER: aarch64-linux-gnu-gcc
       - name: zip ${{ matrix.os }-x86_64} artifact
         run: zip my_raylib_game.zip my_raylib_game
-      - name: zip ${{ matrix.os }-arm64} artifact
+      - name: zip ${{ matrix.os }-arm64}} artifact
+        if: matrix.os == 'ubuntu'
         run: cd build-arm64 && zip ../my_raylib_game-arm64.zip my_raylib_game
       - name: upload ${{ matrix.os }} artifact
         uses: actions/upload-release-asset@v1
