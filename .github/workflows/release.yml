@@ -52,7 +52,7 @@ jobs:
       - name: setup
         run: |
           sudo apt-get update
-          sudo apt-get install -y qemu-aarch6 qemu-arm binfmt-misc
+          sudo apt-get install -y qemu qemu-system-misc qemu-user-static qemu-user binfmt-support
       - name: linux x86_64
         run: |
           sudo apt-get install -y xorg-dev libglu1-mesa-dev
