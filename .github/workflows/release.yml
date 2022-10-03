@@ -8,6 +8,7 @@ name: Release
 # this will build for window/mac/linux on x86_64 and linux on aarch64/armhf
 # TODO: work out tpoechtrager/osxcross to build aarch64 for OSX (on linux)
 # TODO: pre-build docker containers for linux aarch64/armhf and mac aarch64
+# TODO: look into docker buildx build --platform=linux/amd64,linux/arm64,linux/armhf .
 
 on:
   push
@@ -48,9 +49,13 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
+      - name: setup
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y qemu-aarch6 qemu-arm binfmt-misc
       - name: linux x86_64
         run: |
-          sudo apt-get update && sudo apt-get install -y xorg-dev libglu1-mesa-dev
+          sudo apt-get install -y xorg-dev libglu1-mesa-dev
           mkdir -p build-linux-x86_64
           cd build-linux-x86_64/
           cmake ..
