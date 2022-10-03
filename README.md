@@ -1,3 +1,5 @@
+[![Release](https://github.com/konsumer/demo-ci-cross-compile/actions/workflows/release.yml/badge.svg)](https://github.com/konsumer/demo-ci-cross-compile/actions/workflows/release.yml)
+
 This is a very simple raylib app built with cmake that automatically releases for all supported platforms (windows x86-64, mac x86-64/arm64, linux x86-64/arm64/arm32).
 
 ## local usage
