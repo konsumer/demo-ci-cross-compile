@@ -2,8 +2,8 @@ name: Release
 
 on: push
 
-# this will build for window/linux on x86_64 and linux on aarch64/armhf and mac universal (x86_64/arm64)
-# TODO: pre-build docker containers for linux aarch64/armhf
+# this will build for window/linux on x86_64 and linux on arm64/arm7 and mac universal (x86_64/arm64)
+# TODO: pre-build docker containers for linux arm64/arm7
 
 
 jobs:
@@ -29,18 +29,18 @@ jobs:
           files: build-linux-x86_64/my_raylib_game
           recursive: false
           dest: my_raylib_game-linux-x86_64.zip
-      - name: zip linux-aarch64
+      - name: zip linux-arm64
         uses: vimtor/action-zip@v1
         with:
-          files: build-linux-aarch64/my_raylib_game
+          files: build-linux-arm64/my_raylib_game
           recursive: false
-          dest: my_raylib_game-linux-aarch64.zip
-      - name: zip linux-armhf
+          dest: my_raylib_game-linux-arm64.zip
+      - name: zip linux-arm7
         uses: vimtor/action-zip@v1
         with:
-          files: build-linux-armhf/my_raylib_game
+          files: build-linux-arm7/my_raylib_game
           recursive: false
-          dest: my_raylib_game-linux-armhf.zip
+          dest: my_raylib_game-linux-arm7.zip
       - name: create_release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v1
@@ -49,8 +49,8 @@ jobs:
             my_raylib_game-windows.zip
             my_raylib_game-mac.zip
             my_raylib_game-linux-x86_64.zip
-            my_raylib_game-linux-aarch64.zip
-            my_raylib_game-linux-armhf.zip
+            my_raylib_game-linux-arm64.zip
+            my_raylib_game-linux-arm7.zip
           
   
   windows:
@@ -111,26 +111,24 @@ jobs:
           cd build-linux-x86_64/
           cmake ..
           make
-      - name: linux aarch64
+      - name: linux arm64
         uses: addnab/docker-run-action@v3
         with:
-          image: ubuntu:latest
-          options: -v ${{ github.workspace }}:/workdir -w /workdir --platform linux/aarch64
+          image: konsumer/node-raylib-builder:latest
+          options: -v ${{ github.workspace }}:/workdir -w /workdir --platform linux/arm64
           run: |
-            apt-get update && apt-get install -y xorg-dev libglu1-mesa-dev cmake git g++
-            mkdir -p build-linux-aarch64
-            cd build-linux-aarch64/
+            mkdir -p build-linux-arm64
+            cd build-linux-arm64/
             cmake ..
             make
-      - name: linux armhf
+      - name: linux arm7
         uses: addnab/docker-run-action@v3
         with:
-          image: ubuntu:latest
-          options: -v ${{ github.workspace }}:/workdir -w /workdir --platform linux/armhf
+          image: konsumer/node-raylib-builder:latest
+          options: -v ${{ github.workspace }}:/workdir -w /workdir --platform linux/arm/v7
           run: |
-            apt-get update && apt-get install -y xorg-dev libglu1-mesa-dev cmake git g++
-            mkdir -p build-linux-armhf
-            cd build-linux-armhf/
+            mkdir -p build-linux-arm7
+            cd build-linux-arm7/
             cmake ..
             make
       - name: Archive artifacts
