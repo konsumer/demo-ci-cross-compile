@@ -1,20 +1,16 @@
 name: Release
 
-on:
-  push:
-    tags:
-      - 'v*'
+on: push
 
 # this will build for window/linux on x86_64 and linux on aarch64/armhf and mac universal (x86_64/arm64)
-# TODO: pre-build docker containers for linux aarch64/armhf and mac aarch64
+# TODO: pre-build docker containers for linux aarch64/armhf
 
 
 jobs:
-  create_release:
+  publish:
     runs-on: ubuntu
     needs: [windows, mac, linux]
-    outputs:
-      upload_url: ${{ steps.create_release.outputs.upload_url }}
+    if: startsWith(github.ref, 'refs/tags/')
     steps:
       - name: zip windows
         uses: vimtor/action-zip@v1
@@ -83,9 +79,10 @@ jobs:
         run: |
           mkdir -p build-mac-universal
           cd build-mac-universal/
-          export CMAKE_OSX_ARCHITECTURES="arm64;x86_64"
           cmake ..
           make
+        env:
+          CMAKE_OSX_ARCHITECTURES: "arm64;x86_64"
       
   linux:
     runs-on: ubuntu-latest
