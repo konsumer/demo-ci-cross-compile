@@ -16,6 +16,36 @@ jobs:
     outputs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
     steps:
+      - name: zip windows
+        uses: vimtor/action-zip@v1
+        with:
+          files: build-windows-x86_64/my_raylib_game.exe
+          recursive: false
+          dest: my_raylib_game-windows.zip
+      - name: zip mac
+        uses: vimtor/action-zip@v1
+        with:
+          files: build-mac-universal/my_raylib_game
+          recursive: false
+          dest: my_raylib_game-mac.zip
+      - name: zip linux-x86_64
+        uses: vimtor/action-zip@v1
+        with:
+          files: build-linux-x86_64/my_raylib_game
+          recursive: false
+          dest: my_raylib_game-linux-x86_64.zip
+      - name: zip linux-aarch64
+        uses: vimtor/action-zip@v1
+        with:
+          files: build-linux-aarch64/my_raylib_game
+          recursive: false
+          dest: my_raylib_game-linux-aarch64.zip
+      - name: zip linux-armhf
+        uses: vimtor/action-zip@v1
+        with:
+          files: build-linux-armhf/my_raylib_game
+          recursive: false
+          dest: my_raylib_game-linux-armhf.zip
       - name: create_release
         id: create_release
         uses: softprops/action-gh-release@v1
@@ -41,7 +71,6 @@ jobs:
           cd build-windows-x86_64
           cmake .. -G "MinGW Makefiles"
           make
-          zip ../my_raylib_game-windows.zip my_raylib_game.exe
 
   mac:
     runs-on: macos-latest
@@ -57,7 +86,6 @@ jobs:
           export CMAKE_OSX_ARCHITECTURES="arm64;x86_64"
           cmake ..
           make
-          zip ../my_raylib_game-mac.zip my_raylib_game
       
   linux:
     runs-on: ubuntu-latest
@@ -77,7 +105,6 @@ jobs:
           cd build-linux-x86_64/
           cmake ..
           make
-          zip ../my_raylib_game-linux-x86_64.zip my_raylib_game
       - name: linux aarch64
         uses: addnab/docker-run-action@v3
         with:
@@ -89,7 +116,6 @@ jobs:
             cd build-linux-aarch64/
             cmake ..
             make
-            zip ../my_raylib_game-linux-aarch64.zip my_raylib_game
       - name: linux armhf
         uses: addnab/docker-run-action@v3
         with:
@@ -101,6 +127,5 @@ jobs:
             cd build-linux-armhf/
             cmake ..
             make
-            zip ../my_raylib_game-linux-armhf.zip my_raylib_game
   
 
