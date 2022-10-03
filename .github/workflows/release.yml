@@ -5,108 +5,77 @@ name: Release
 #     tags:
 #       - 'v*'
 
+# this will build for window/mac/linux on x86_64 and linux on aarch64/armhf
+# TODO: work out tpoechtrager/osxcross to build aarch64 for OSX (on linux)
+# TODO: pre-build docker containers for linux aarch64/armhf and mac aarch64
+
 on:
   push
 
 jobs:
-  create_release:
-    runs-on: ubuntu
-    outputs:
-      upload_url: ${{ steps.create_release.outputs.upload_url }}
-    steps:
-      - name: create_release
-        id: create_release
-        uses: actions/create-release@v1
-        with:
-          draft: false
-          prerelease: false
-          release_name: Automated Release ${{ github.ref }}
-          tag_name: release-${{ github.sha }} # ${{ github.ref }}
-          body: This is an automated release for ${{ github.ref }}.
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-  
-  linux:
-    needs: create_release
-    runs-on: ubuntu-latest
-    steps:
-      - name: checkout
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-      - name: setup
-        run: sudo apt-get update && sudo apt-get install -y xorg-dev libglu1-mesa-dev cmake binutils-aarch64-linux-gnu gcc-aarch64-linux-gnu
-      - name: builld-x86_64 artifact
-        run: cmake . && make
-      - name: builld-arm64 artifact
-        run: cmake -S . build-arm64 && cd build-arm64 && make
-        env:
-          CMAKE_SYSTEM_PROCESSOR: aarch64
-          CMAKE_C_COMPILER: aarch64-linux-gnu-gcc
-      - name: zip artifact (x86-64)
-        run: zip my_raylib_game.zip my_raylib_game
-      - name: zip artifact (arm64)
-        run: cd build-arm64 && zip ../my_raylib_game-arm64.zip my_raylib_game
-      - name: upload artifact (x86-64)
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        with:
-          upload_url: ${{ needs.create_release.outputs.upload_url }}
-          asset_path:  my_raylib_game.zip
-          asset_name:  my_raylib_game-linux-x86_64.zip
-          asset_content_type: application/zip
-      - name: upload artifact (x86-64)
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        with:
-          upload_url: ${{ needs.create_release.outputs.upload_url }}
-          asset_path:  my_raylib_game-arm64.zip
-          asset_name:  my_raylib_game-linux-arm64.zip
-          asset_content_type: application/zip
-
-  mac:
-    needs: create_release
-    runs-on: macos-latest
-    steps:
-      - name: checkout
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-      - name: builld-x86_64 artifact
-        run: cmake . && make
-      - name: zip artifact
-        run: zip my_raylib_game.zip my_raylib_game
-      - name: upload artifact
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        with:
-          upload_url: ${{ needs.create_release.outputs.upload_url }}
-          asset_path:  my_raylib_game.zip
-          asset_name:  my_raylib_game-linux-x86_64.zip
-          asset_content_type: application/zip
-
   windows:
-    needs: create_release
     runs-on: windows-latest
     steps:
       - name: checkout
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - name: builld-x86_64 artifact
-        run: cmake . -G "MinGW Makefiles" && make
-      - name: zip artifact
-        run: zip my_raylib_game.zip my_raylib_game.exe
-      - name: upload artifact
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
+      - name: windows x86_64
+        run: |
+          mkdir -p build-windows-x86_64
+          cd build-windows-x86_64
+          cmake .. -G "MinGW Makefiles"
+          make
+
+  mac:
+    runs-on: macos-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
         with:
-          upload_url: ${{ needs.create_release.outputs.upload_url }}
-          asset_path:  my_raylib_game.zip
-          asset_name:  my_raylib_game-windows-x86_64.zip
-          asset_content_type: application/zip
+          fetch-depth: 0
+      - name: mac x86_64
+        run: |
+          mkdir -p build-mac-x86_64
+          cd build-mac-x86_64/
+          cmake ..
+          make
+      
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: linux x86_64
+        run: |
+          sudo apt-get update && sudo apt-get install -y xorg-dev libglu1-mesa-dev
+          mkdir -p build-linux-x86_64
+          cd build-linux-x86_64/
+          cmake ..
+          make
+      - name: linux aarch64
+        uses: addnab/docker-run-action@v3
+        with:
+          image: ubuntu:latest
+          options: -v ${{ github.workspace }}:/workdir -w /workdir --platform linux/aarch64
+          run: |
+            apt-get update && apt-get install -y xorg-dev libglu1-mesa-dev cmake git g++
+            mkdir -p build-linux-aarch64
+            cd build-linux-aarch64/
+            cmake ..
+            make
+      - name: linux armhf
+        uses: addnab/docker-run-action@v3
+        with:
+          image: ubuntu:latest
+          options: -v ${{ github.workspace }}:/workdir -w /workdir --platform linux/armhf
+          run: |
+            apt-get update && apt-get install -y xorg-dev libglu1-mesa-dev cmake git g++
+            mkdir -p build-linux-armhf
+            cd build-linux-armhf/
+            cmake ..
+            make
+  
 
