@@ -33,19 +33,12 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - name: mac x86_64
+      - name: mac universal
         run: |
-          mkdir -p build-mac-x86_64
-          cd build-mac-x86_64/
+          mkdir -p build-mac-universal
+          cd build-mac-universal/
+          export CMAKE_OSX_ARCHITECTURES="arm64;x86_64"
           cmake ..
-          make
-      - name: mac arm64
-        run: |
-          arch -arm64 brew install cmake
-          export CMAKE_OSX_ARCHITECTURES=arm64
-          mkdir -p build-mac-arm64
-          cd build-mac-arm64
-          arch -arm64 cmake ..
           make
       
   linux:
