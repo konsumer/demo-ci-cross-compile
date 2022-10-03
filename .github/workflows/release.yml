@@ -8,7 +8,7 @@ on: push
 
 jobs:
   publish:
-    runs-on: ubuntu
+    runs-on: ubuntu-latest
     needs: [windows, mac, linux]
     steps:
       - name: zip windows
@@ -115,7 +115,7 @@ jobs:
         uses: addnab/docker-run-action@v3
         with:
           image: konsumer/node-raylib-builder:latest
-          options: -v ${{ github.workspace }}:/workdir -w /workdir --platform linux/arm64
+          options: -v ${{ github.workspace }}:/workdir --platform linux/arm64
           run: |
             mkdir -p build-linux-arm64
             cd build-linux-arm64/
@@ -125,7 +125,7 @@ jobs:
         uses: addnab/docker-run-action@v3
         with:
           image: konsumer/node-raylib-builder:latest
-          options: -v ${{ github.workspace }}:/workdir -w /workdir --platform linux/arm/v7
+          options: -v ${{ github.workspace }}:/workdir --platform linux/arm/v7
           run: |
             mkdir -p build-linux-arm7
             cd build-linux-arm7/
