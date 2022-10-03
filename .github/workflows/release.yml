@@ -45,6 +45,8 @@ jobs:
           CMAKE_C_COMPILER: aarch64-linux-gnu-gcc
       - name: zip artifact (x86-64)
         run: zip my_raylib_game.zip my_raylib_game
+       - name: zip artifact (arm64)
+        run: cd build-arm64 && zip ../my_raylib_game-arm64.zip my_raylib_game
       - name: upload artifact (x86-64)
         uses: actions/upload-release-asset@v1
         env:
@@ -54,8 +56,6 @@ jobs:
           asset_path:  my_raylib_game.zip
           asset_name:  my_raylib_game-linux-x86_64.zip
           asset_content_type: application/zip
-      - name: zip artifact (arm64)
-        run: cd build-arm64 && zip ../my_raylib_game-arm64.zip my_raylib_game
       - name: upload artifact (x86-64)
         uses: actions/upload-release-asset@v1
         env:
