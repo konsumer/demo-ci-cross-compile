@@ -12,7 +12,25 @@ on:
   push
 
 jobs:
+  create_release:
+    runs-on: ubuntu
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+    steps:
+      - name: create_release
+        id: create_release
+        uses: actions/create-release@v1
+        with:
+          draft: false
+          prerelease: false
+          release_name: Automated Release ${{ github.ref }}
+          tag_name: release-${{ github.sha }} # ${{ github.ref }}
+          body: This is an automated release for ${{ github.ref }}.
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+  
   windows:
+    needs: create_release
     runs-on: windows-latest
     steps:
       - name: checkout
@@ -25,8 +43,22 @@ jobs:
           cd build-windows-x86_64
           cmake .. -G "MinGW Makefiles"
           make
+      - name: zip artifact (x86-64)
+        run: |
+          cd build-windows-x86_64
+          zip ../my_raylib_game-windows.zip my_raylib_game.exe
+      - name: upload artifact (x86_64)
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ needs.create_release.outputs.upload_url }}
+          asset_path:  my_raylib_game-windows.zip
+          asset_name:  my_raylib_game-windows.zip
+          asset_content_type: application/zip
 
   mac:
+    needs: create_release
     runs-on: macos-latest
     steps:
       - name: checkout
@@ -40,8 +72,22 @@ jobs:
           export CMAKE_OSX_ARCHITECTURES="arm64;x86_64"
           cmake ..
           make
+      - name: zip artifact (universal)
+        run: |
+          cd build-mac-universal
+          zip ../my_raylib_game-mac.zip my_raylib_game
+      - name: upload artifact (universal)
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ needs.create_release.outputs.upload_url }}
+          asset_path:  my_raylib_game-mac.zip
+          asset_name:  my_raylib_game-mac.zip
+          asset_content_type: application/zip
       
   linux:
+    needs: create_release
     runs-on: ubuntu-latest
     steps:
       - name: checkout
@@ -81,5 +127,44 @@ jobs:
             cd build-linux-armhf/
             cmake ..
             make
+      - name: zip artifact (x86_64)
+        run: |
+          cd build-linux-x86_64
+          zip ../my_raylib_game-linux-x86_64.zip my_raylib_game
+      - name: upload artifact (x86_64)
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ needs.create_release.outputs.upload_url }}
+          asset_path:  my_raylib_game-linux-x86_64.zip
+          asset_name:  my_raylib_game-linux-x86_64.zip
+          asset_content_type: application/zip
+      - name: zip artifact (aarch64)
+        run: |
+          cd build-linux-aarch64
+          zip ../my_raylib_game-linux-aarch64.zip my_raylib_game
+      - name: upload artifact (aarch64)
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ needs.create_release.outputs.upload_url }}
+          asset_path:  my_raylib_game-linux-aarch64.zip
+          asset_name:  my_raylib_game-linux-aarch64.zip
+          asset_content_type: application/zip
+      - name: zip artifact (armhf)
+        run: |
+          cd build-linux-armhf
+          zip ../my_raylib_game-linux-armhf.zip my_raylib_game
+      - name: upload artifact (armhf)
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ needs.create_release.outputs.upload_url }}
+          asset_path:  my_raylib_game-linux-armhf.zip
+          asset_name:  my_raylib_game-linux-armhf.zip
+          asset_content_type: application/zip
   
 
