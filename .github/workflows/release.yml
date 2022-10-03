@@ -6,9 +6,7 @@ name: Release
 #       - 'v*'
 
 # this will build for window/mac/linux on x86_64 and linux on aarch64/armhf
-# TODO: work out tpoechtrager/osxcross to build aarch64 for OSX (on linux)
 # TODO: pre-build docker containers for linux aarch64/armhf and mac aarch64
-# TODO: look into docker buildx build --platform=linux/amd64,linux/arm64,linux/armhf .
 
 on:
   push
@@ -40,6 +38,14 @@ jobs:
           mkdir -p build-mac-x86_64
           cd build-mac-x86_64/
           cmake ..
+          make
+      - name: mac arm64
+        run: |
+          arch -arm64 brew install cmake
+          export CMAKE_OSX_ARCHITECTURES=arm64
+          mkdir -p build-mac-arm64
+          cd build-mac-arm64
+          arch -arm64 cmake ..
           make
       
   linux:
