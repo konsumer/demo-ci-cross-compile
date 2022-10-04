@@ -4,6 +4,7 @@
 cmake-build-debug/
 bin/
 build-*
+*.zip
 out/
 CMakeSettings.json
 .DS_Store

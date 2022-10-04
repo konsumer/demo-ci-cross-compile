@@ -5,7 +5,10 @@
 
 FROM ubuntu:latest
 
-RUN apt-get update && apt-get install -y curl && curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
+ADD https://deb.nodesource.com/setup_18.x /tmp/setup-node
+
+RUN chmod 755 /tmp/setup-node && /tmp/setup-node && rm /tmp/setup-node
 RUN apt-get update && apt-get install -y xorg-dev libglu1-mesa-dev cmake git g++ nodejs
+
 
 WORKDIR /workdir
