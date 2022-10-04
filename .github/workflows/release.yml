@@ -15,27 +15,27 @@ jobs:
       - name: zip windows
         uses: montudor/action-zip@v1
         with:
-          args: zip -qq ../my_raylib_game-windows.zip -r my_raylib_game.exe
+          args: zip -qq ../my_raylib_game-windows.zip -i my_raylib_game.exe
           working-directory: build-windows-x86_64
       - name: zip mac
         uses: montudor/action-zip@v1
         with:
-          args: zip -qq ../my_raylib_game-mac.zip -r my_raylib_game
+          args: zip -qq ../my_raylib_game-mac.zip -i my_raylib_game
           working-directory: build-mac-universal
       - name: zip linux-x86_64
         uses: montudor/action-zip@v1
         with:
-          args: zip -qq ../my_raylib_game-linux-x86_64.zip -r my_raylib_game
+          args: zip -qq ../my_raylib_game-linux-x86_64.zip -i my_raylib_game
           working-directory: build-linux-x86_64
       - name: zip linux-arm64
         uses: montudor/action-zip@v1
         with:
-          args: zip -qq ../my_raylib_game-linux-arm64.zip -r my_raylib_game
+          args: zip -qq ../my_raylib_game-linux-arm64.zip -i my_raylib_game
           working-directory: build-linux-arm64
       - name: zip linux-arm7
         uses: montudor/action-zip@v1
         with:
-          args: zip -qq ../my_raylib_game-linux-arm7.zip -r my_raylib_game
+          args: zip -qq ../my_raylib_game-linux-arm7.zip -i my_raylib_game
           working-directory: build-linux-arm
       - name: create_release
         uses: softprops/action-gh-release@v1
