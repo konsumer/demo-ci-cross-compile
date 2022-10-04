@@ -41,8 +41,7 @@ jobs:
             my_raylib_game-linux-x86_64.zip
             my_raylib_game-linux-arm64.zip
             my_raylib_game-linux-arm7.zip
-          
-  
+
   windows:
     runs-on: windows-latest
     steps:
@@ -59,7 +58,7 @@ jobs:
       - name: Archive artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: build-windows-x86_64
+          name: build-windows
           path: build-windows-x86_64/my_raylib_game.exe
 
   mac:
@@ -80,7 +79,7 @@ jobs:
       - name: Archive artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: build-mac-universal
+          name: build-mac
           path: build-mac-universal/my_raylib_game
       
   linux:
@@ -105,7 +104,7 @@ jobs:
         uses: addnab/docker-run-action@v3
         with:
           image: konsumer/node-raylib-builder:latest
-          options: -v ${{ github.workspace }}:/workdir --platform linux/arm64
+          options: -v ${{ github.workspace }}:/workdir --platform linux/arm64 -e PLATFORM=PLATFORM_DRM
           run: |
             mkdir -p build-linux-arm64
             cd build-linux-arm64/
@@ -115,7 +114,7 @@ jobs:
         uses: addnab/docker-run-action@v3
         with:
           image: konsumer/node-raylib-builder:latest
-          options: -v ${{ github.workspace }}:/workdir --platform linux/arm/v7
+          options: -v ${{ github.workspace }}:/workdir --platform linux/arm/v7 -e PLATFORM=PLATFORM_DRM
           run: |
             mkdir -p build-linux-arm7
             cd build-linux-arm7/
