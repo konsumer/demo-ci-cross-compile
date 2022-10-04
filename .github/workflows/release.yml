@@ -13,30 +13,25 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/')
     steps:
       - name: zip windows
-        uses: montudor/action-zip@v1
-        with:
-          args: zip -qq ../my_raylib_game-windows.zip -i my_raylib_game.exe
-          working-directory: build-windows-x86_64
+        run: |
+          cd build-windows-x86_64
+          zip ../my_raylib_game-windows.zip my_raylib_game.exe
       - name: zip mac
-        uses: montudor/action-zip@v1
-        with:
-          args: zip -qq ../my_raylib_game-mac.zip -i my_raylib_game
-          working-directory: build-mac-universal
+        run: |
+          cd build-mac-universal
+          zip ../my_raylib_game-mac.zip my_raylib_game
       - name: zip linux-x86_64
-        uses: montudor/action-zip@v1
-        with:
-          args: zip -qq ../my_raylib_game-linux-x86_64.zip -i my_raylib_game
-          working-directory: build-linux-x86_64
+        run: |
+          cd build-linux-x86_64
+          zip ../my_raylib_game-linux-x86_64.zip my_raylib_game
       - name: zip linux-arm64
-        uses: montudor/action-zip@v1
-        with:
-          args: zip -qq ../my_raylib_game-linux-arm64.zip -i my_raylib_game
-          working-directory: build-linux-arm64
+        run: |
+          cd build-linux-arm64
+          zip ../my_raylib_game-linux-arm64.zip my_raylib_game
       - name: zip linux-arm7
-        uses: montudor/action-zip@v1
-        with:
-          args: zip -qq ../my_raylib_game-linux-arm7.zip -i my_raylib_game
-          working-directory: build-linux-arm
+        run: |
+          cd build-linux-arm7
+          zip ../my_raylib_game-linux-arm7.zip my_raylib_game
       - name: create_release
         uses: softprops/action-gh-release@v1
         with:
