@@ -41,7 +41,7 @@ jobs:
           key: windows-x86_64-cmake
       - name: Build
         run: |
-          mkdir -p build-windows-x86_64
+          New-Item -Type Directory -Force build-windows-x86_64
           cd build-windows-x86_64
           cmake .. -G "MinGW Makefiles"
           make
