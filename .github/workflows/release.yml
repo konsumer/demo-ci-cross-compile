@@ -1,4 +1,5 @@
 # this will build for window/linux on x86_64 and linux on arm64/arm7 and mac universal (x86_64/arm64)
+# "Archive artifacts" is optional, and is just to show build-output before release is made
 
 name: Release
 
@@ -54,11 +55,11 @@ jobs:
     runs-on: windows-latest
     needs: checkout
     steps:
-      - name: Cache Cmake
-        uses: actions/cache@v3
-        with:
-          path: build-windows-x86_64/
-          key: windows-x86_64-cmake
+      # - name: Cache Cmake
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: build-windows-x86_64/
+      #     key: windows-x86_64-cmake
       - name: windows x86_64
         run: |
           mkdir -p build-windows-x86_64
@@ -75,11 +76,11 @@ jobs:
     runs-on: macos-latest
     needs: checkout
     steps:
-      - name: Cache Cmake
-        uses: actions/cache@v3
-        with:
-          path: build-mac-universal/
-          key: mac-cmake
+      # - name: Cache Cmake
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: build-mac-universal/
+      #     key: mac-cmake
       - name: mac universal
         run: |
           mkdir -p build-mac-universal
@@ -98,21 +99,21 @@ jobs:
     runs-on: ubuntu-latest
     needs: checkout
     steps:
-      - name: Cache Cmake (x86_64)
-        uses: actions/cache@v3
-        with:
-          path: build-linux-x86_64/
-          key: linux-x86_64-cmake
-      - name: Cache Cmake (arm64)
-        uses: actions/cache@v3
-        with:
-          path: build-linux-arm64/
-          key: linux-arm64-cmake
-      - name: Cache Cmake (arm7)
-        uses: actions/cache@v3
-        with:
-          path: build-linux-arm7/
-          key: linux-arm7-cmake
+      # - name: Cache Cmake (x86_64)
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: build-linux-x86_64/
+      #     key: linux-x86_64-cmake
+      # - name: Cache Cmake (arm64)
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: build-linux-arm64/
+      #     key: linux-arm64-cmake
+      # - name: Cache Cmake (arm7)
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: build-linux-arm7/
+      #     key: linux-arm7-cmake
       - name: setup
         run: |
           sudo apt-get update
