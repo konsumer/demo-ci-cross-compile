@@ -16,7 +16,7 @@ int main(void) {
   while (!WindowShouldClose()) {
     BeginDrawing();
     ClearBackground(RAYWHITE);
-    DrawCenteredText("OMG! IT WORKS!", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 50, BLACK);
+    DrawCenteredText("OMG! IT WORKS! (cache check)", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 50, BLACK);
     EndDrawing();
   }
 
