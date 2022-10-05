@@ -49,6 +49,11 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
+      - name: Cache Cmake
+        uses: actions/cache@v3
+        with:
+          path: build-windows-x86_64/
+          key: windows-x86_64-cmake
       - name: windows x86_64
         run: |
           mkdir -p build-windows-x86_64
@@ -68,6 +73,11 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
+      - name: Cache Cmake
+        uses: actions/cache@v3
+        with:
+          path: build-mac-universal/
+          key: mac-cmake
       - name: mac universal
         run: |
           mkdir -p build-mac-universal
@@ -89,6 +99,21 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
+      - name: Cache Cmake (x86_64)
+        uses: actions/cache@v3
+        with:
+          path: build-linux-x86_64/
+          key: linux-x86_64-cmake
+      - name: Cache Cmake (arm64)
+        uses: actions/cache@v3
+        with:
+          path: build-linux-arm64/
+          key: linux-arm64-cmake
+      - name: Cache Cmake (arm7)
+        uses: actions/cache@v3
+        with:
+          path: build-linux-arm7/
+          key: linux-arm7-cmake
       - name: setup
         run: |
           sudo apt-get update
