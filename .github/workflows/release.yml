@@ -42,19 +42,14 @@ jobs:
             my_raylib_game-linux-x86_64.zip
             my_raylib_game-linux-arm64.zip
             my_raylib_game-linux-arm7.zip
-
-  checkout:
-    runs-on: ubuntu-latest
+  
+  windows:
+    runs-on: windows-latest
     steps:
       - name: checkout
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-  
-  windows:
-    runs-on: windows-latest
-    needs: checkout
-    steps:
       # - name: Cache Cmake
       #   uses: actions/cache@v3
       #   with:
@@ -74,8 +69,11 @@ jobs:
 
   mac:
     runs-on: macos-latest
-    needs: checkout
     steps:
+      - name: checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       # - name: Cache Cmake
       #   uses: actions/cache@v3
       #   with:
@@ -97,8 +95,11 @@ jobs:
       
   linux:
     runs-on: ubuntu-latest
-    needs: checkout
     steps:
+      - name: checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       # - name: Cache Cmake (x86_64)
       #   uses: actions/cache@v3
       #   with:
