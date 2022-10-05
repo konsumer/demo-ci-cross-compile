@@ -123,7 +123,7 @@ jobs:
         with:
           path: build-linux-arm7/
           key: linux-arm7-cmake
-      - name: setup
+      - name: Setup Qemu (for arm-builds)
         run: |
           sudo apt-get update
           sudo apt-get install -y qemu qemu-system-misc qemu-user-static qemu-user binfmt-support
