@@ -9,76 +9,72 @@ on:
       - 'v[0-9]+.[0-9]+.[0-9]+'
 
 jobs:
-  publish:
+  create_release:
     runs-on: ubuntu-latest
-    needs: [windows, mac, linux]
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
     steps:
-      - name: zip windows
-        run: |
-          cd build-windows-x86_64
-          zip ../my_raylib_game-windows.zip my_raylib_game.exe
-      - name: zip mac
-        run: |
-          cd build-mac-universal
-          zip ../my_raylib_game-mac.zip my_raylib_game
-      - name: zip linux-x86_64
-        run: |
-          cd build-linux-x86_64
-          zip ../my_raylib_game-linux-x86_64.zip my_raylib_game
-      - name: zip linux-arm64
-        run: |
-          cd build-linux-arm64
-          zip ../my_raylib_game-linux-arm64.zip my_raylib_game
-      - name: zip linux-arm7
-        run: |
-          cd build-linux-arm7
-          zip ../my_raylib_game-linux-arm7.zip my_raylib_game
       - name: create_release
-        uses: softprops/action-gh-release@v1
+        id: create_release
+        uses: actions/create-release@v1
         with:
-          files: |
-            my_raylib_game-windows.zip
-            my_raylib_game-mac.zip
-            my_raylib_game-linux-x86_64.zip
-            my_raylib_game-linux-arm64.zip
-            my_raylib_game-linux-arm7.zip
+          draft: false
+          prerelease: false
+          release_name: Automated Release ${{ github.ref }}
+          tag_name: ${{ github.ref }}
+          body: This is an automated release for ${{ github.ref }}.
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
   
   windows:
     runs-on: windows-latest
+    needs: create_release
     steps:
-      - name: checkout
+      - name: Checkout
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      # - name: Cache Cmake
-      #   uses: actions/cache@v3
-      #   with:
-      #     path: build-windows-x86_64/
-      #     key: windows-x86_64-cmake
-      - name: windows x86_64
+      - name: Cache Cmake
+        uses: actions/cache@v3
+        with:
+          path: build-windows-x86_64/
+          key: windows-x86_64-cmake
+      - name: Build
         run: |
           mkdir -p build-windows-x86_64
           cd build-windows-x86_64
           cmake .. -G "MinGW Makefiles"
           make
-      - name: Archive artifacts
-        uses: actions/upload-artifact@v3
+      - name: Archive Release
+        uses: thedoctor0/zip-release@main
         with:
-          name: build-windows
-          path: build-windows-x86_64/my_raylib_game.exe
+          type: zip
+          filename: mygame-windows.zip
+          directory: build-windows-x86_64
+          path: my_raylib_game.exe
+      - name: Attach Release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ needs.create_release.outputs.upload_url }}
+          asset_path: build-windows-x86_64/mygame-windows.zip
+          asset_name: mygame-windows.zip
+          asset_content_type: application/octet-stream
 
   mac:
     runs-on: macos-latest
+    needs: create_release
     steps:
       - name: checkout
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      # - name: Cache Cmake
-      #   uses: actions/cache@v3
-      #   with:
-      #     path: build-mac-universal/
-      #     key: mac-cmake
+      - name: Cache Cmake
+        uses: actions/cache@v3
+        with:
+          path: build-mac-universal/
+          key: mac-cmake
       - name: mac universal
         run: |
           mkdir -p build-mac-universal
@@ -87,34 +83,46 @@ jobs:
           make
         env:
           CMAKE_OSX_ARCHITECTURES: "arm64;x86_64"
-      - name: Archive artifacts
-        uses: actions/upload-artifact@v3
+      - name: Archive Release
+        uses: thedoctor0/zip-release@main
         with:
-          name: build-mac
-          path: build-mac-universal/my_raylib_game
+          type: zip
+          filename: mygame-mac.zip
+          directory: build-mac-universal
+          path: my_raylib_game
+      - name: Attach Release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ needs.create_release.outputs.upload_url }}
+          asset_path: build-mac-universal/mygame-mac.zip
+          asset_name: mygame-mac.zip
+          asset_content_type: application/octet-stream
       
   linux:
     runs-on: ubuntu-latest
+    needs: create_release
     steps:
       - name: checkout
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      # - name: Cache Cmake (x86_64)
-      #   uses: actions/cache@v3
-      #   with:
-      #     path: build-linux-x86_64/
-      #     key: linux-x86_64-cmake
-      # - name: Cache Cmake (arm64)
-      #   uses: actions/cache@v3
-      #   with:
-      #     path: build-linux-arm64/
-      #     key: linux-arm64-cmake
-      # - name: Cache Cmake (arm7)
-      #   uses: actions/cache@v3
-      #   with:
-      #     path: build-linux-arm7/
-      #     key: linux-arm7-cmake
+      - name: Cache Cmake (x86_64)
+        uses: actions/cache@v3
+        with:
+          path: build-linux-x86_64/
+          key: linux-x86_64-cmake
+      - name: Cache Cmake (arm64)
+        uses: actions/cache@v3
+        with:
+          path: build-linux-arm64/
+          key: linux-arm64-cmake
+      - name: Cache Cmake (arm7)
+        uses: actions/cache@v3
+        with:
+          path: build-linux-arm7/
+          key: linux-arm7-cmake
       - name: setup
         run: |
           sudo apt-get update
@@ -126,6 +134,22 @@ jobs:
           cd build-linux-x86_64/
           cmake ..
           make
+      - name: Archive Release (x86_64)
+        uses: thedoctor0/zip-release@main
+        with:
+          type: zip
+          filename: mygame-linux-x86_64.zip
+          directory: build-linux-x86_64
+          path: my_raylib_game
+      - name: Attach Release (x86_64)
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ needs.create_release.outputs.upload_url }}
+          asset_path: build-linux-x86_64/mygame-linux-x86_64.zip
+          asset_name: mygame-linux-x86_64.zip
+          asset_content_type: application/octet-stream
       - name: linux arm64
         uses: addnab/docker-run-action@v3
         with:
@@ -136,6 +160,22 @@ jobs:
             cd build-linux-arm64/
             cmake ..
             make
+      - name: Archive Release (arm64)
+        uses: thedoctor0/zip-release@main
+        with:
+          type: zip
+          filename: mygame-linux-arm64.zip
+          directory: build-linux-arm64
+          path: my_raylib_game
+      - name: Attach Release (arm64)
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ needs.create_release.outputs.upload_url }}
+          asset_path: build-linux-arm64/mygame-linux-arm64.zip
+          asset_name: mygame-linux-arm64.zip
+          asset_content_type: application/octet-stream
       - name: linux arm7
         uses: addnab/docker-run-action@v3
         with:
@@ -146,10 +186,21 @@ jobs:
             cd build-linux-arm7/
             cmake ..
             make
-      - name: Archive artifacts
-        uses: actions/upload-artifact@v3
+      - name: Archive Release (arm7)
+        uses: thedoctor0/zip-release@main
         with:
-          name: build-linux
-          path: build-linux-*/my_raylib_game
+          type: zip
+          filename: mygame-linux-arm7.zip
+          directory: build-linux-arm7
+          path: my_raylib_game
+      - name: Attach Release (arm7)
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ needs.create_release.outputs.upload_url }}
+          asset_path: build-linux-arm7/mygame-linux-arm7.zip
+          asset_name: mygame-linux-arm7.zip
+          asset_content_type: application/octet-stream
   
 
